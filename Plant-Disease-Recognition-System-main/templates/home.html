@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Recognition</title>
+    <link rel="icon" href="../static/images/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <!-- Modern styles for navbar and modals -->
+    <style>
+    /* Modern Navigation Bar */
+    .modern-navbar {
+      background: linear-gradient(99deg, #20e295 0%, #2e8cff 120%);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(30,80,70,0.09);
+      border-bottom: 2px solid #e7ffe7;
+      border-radius: 0 0 24px 24px;
+      position: sticky; top: 0; z-index: 999;
+      margin-bottom: 0;
+      padding: 0.5em 0 0.5em 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .modern-navbar .navbar-container {
+      max-width: 1250px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+    .modern-navbar .logo {
+      font-size: 1.7rem; font-weight: bold; color: #fff;
+      text-shadow: 0 3px 24px #8fffa055;
+      letter-spacing: 1.5px;
+      user-select:none;
+    }
+    .modern-navbar .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+    }
+    .modern-navbar .nav-links a, .modern-navbar .nav-links button {
+      color: #fff;
+      font-weight: 500;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.11em;
+      letter-spacing: 0.2px;
+      transition: background .21s, color 0.25s, border-radius 0.25s;
+      padding: 0.38em 1em;
+      border-radius: 16px;
+      text-decoration: none;
+      box-shadow: 0 2px 8px #10ccff08;
+    }
+    .modern-navbar .nav-links a:hover,
+    .modern-navbar .nav-links button:hover,
+    .modern-navbar .nav-links .active {
+      color: #20e295;
+      background: #fff;
+      border-radius: 18px;
+      text-shadow: none;
+    }
+    @media (max-width:900px) {
+      .modern-navbar .navbar-container {padding:0 10px;}
+      .modern-navbar .logo {font-size:1.35rem;}
+    }
+    @media (max-width:600px) {
+      .modern-navbar .nav-links { gap:0.7em; font-size:0.95em;}
+      .modern-navbar .logo {font-size:1.08rem;}
+      .modern-navbar .navbar-container{flex-direction:column;padding:0 2px;}
+    }
+
+    /* Modern modal styles */
+    .custom-modal-bg {
+      background: linear-gradient(120deg, #c3ffe4 0%, #f8ffe8 100%);
+    }
+    .custom-modal-card {
+      background: linear-gradient(108deg, #fffbe7 70%, #d7fff1 100%);
+      box-shadow: 0 10px 32px rgba(0,0,0,.12);
+      border-radius: 18px;
+      padding: 2.5em 2em 2em 2em;
+      min-width: 340px;
+      max-width: 98vw;
+      text-align: center;
+      animation: slideup 0.6s;
+      position: relative;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .custom-modal-card h2 {
+      color: #179c6b;
+      font-weight: 700;
+      letter-spacing:1px;
+      margin-bottom:1em;
+      text-shadow:0 2px 14px #d4ffee40;
+    }
+    .custom-modal-card input {
+      width: 90%;
+      margin: 0.7em auto;
+      padding: 0.9em 1em;
+      font-size: 1em;
+      border-radius: 12px;
+      border: 1px solid #b1e1c6;
+      background: #f2fff1;
+      box-shadow: 0 2px 10px #efffee3a;
+      font-family: inherit;
+      transition:.25s;
+    }
+    .custom-modal-card input:focus {
+      outline: 2px solid #179c6b;
+      background: #fff;
+    }
+    .custom-modal-card button {
+      background: linear-gradient(90deg,#13ab74,#179c6b);
+      color: #fff;
+      border: none;
+      padding: 0.8em 2.5em;
+      border-radius: 100px;
+      font-size: 1.08em;
+      font-weight:600;
+      box-shadow: 0 2px 8px rgba(20,170,120,.09);
+      margin-top:1em;
+      cursor:pointer;
+      transition:.23s;
+    }
+    .custom-modal-card button.close-modal,
+    .custom-modal-card button.cancel-btn {
+      background: #ECECEC;
+      color: #179c6b;
+      box-shadow:unset;
+      padding: 0.7em 2em;
+      margin-top:1.1em;
+    }
+    .custom-modal-card .modal-switch {
+      margin-top: 1.6em;
+      font-size: 0.95em;
+      color: #16996d;
+    }
+    .custom-modal-card .modal-switch button {
+      background:none;color:#179c6b;border:none;font-size:1em;cursor:pointer;
+      font-weight:600;margin:0;padding:0;text-decoration:underline;
+    }
+    /* Profile styling */
+    .profile-menu {
+      background: linear-gradient(120deg,#d1ffee,#fffbe7 80%);
+      box-shadow:0 6px 32px #179c6b1c;
+      border-radius: 14px;
+      min-width: 200px;
+      padding: 1.2em 1em 1em 1em;
+      text-align:left;
+      animation: fadeIn 0.55s;
+      border: 1.2px solid #b1e1c6;
+      color:#212d33;
+    }
+    .profile-menu h4{
+      font-weight:700;
+      color:#179c6b;
+      margin-bottom:0.2em;
+      margin-left:0.1em;
+      letter-spacing:0.9px;
+      font-size:1.1em;
+    }
+    .profile-menu p{
+      margin:0.55em 0.2em 0.4em 0.2em;
+      font-size:0.98em;
+      color:#35795b;
+      font-weight:500;
+    }
+    .profile-menu button{
+      background: linear-gradient(90deg,#ff8181,#f7bd7c 80%);
+      color: #fff;
+      border:none;
+      font-weight:600;
+      padding:0.8em 2em;
+      border-radius:100px;
+      font-size:1em;
+      cursor:pointer;
+      margin-top:0.7em;
+      width:90%;
+      box-shadow:0 1px 8px #ffa1a140;
+      transition:.22s;
+    }
+    @keyframes slideup {
+      from{opacity:0;transform:translateY(60px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+    @keyframes fadeIn {
+      from{opacity:0;}
+      to{opacity:1;}
+    }
+    </style>
+</head>
+
+<body>
+<!-- ===== MODERN NAVBAR AT THE TOP ===== -->
+<nav class="modern-navbar">
+  <div class="navbar-container">
+    <div class="logo">Plant Diagnosis Pro</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#" class="active">Home</a></li>
+      <li><a href="#">Upload</a></li>
+      <li><a href="#">Results</a></li>
+      <li><a href="#">History</a></li>
+      <li><a href="#">Dashboard</a></li>
+      <li id="profileNav" style="display:none;">
+        <button onclick="toggleProfileMenu()">Profile</button>
+        <div class="profile-menu" id="profileMenu" style="display:none; position:absolute; top:54px; right:2rem;">
+          <h4>User Profile</h4>
+          <p id="profileName"></p>
+          <p id="profileEmail"></p>
+          <button onclick="signout()">Sign Out</button>
+        </div>
+      </li>
+      <li id="loginNav"><button onclick="showLogin()">Login</button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- LOGIN MODAL -->
+<div class="login-modal custom-modal-bg" id="loginModal" style="display:none; position:fixed; z-index:20; left:0; top:0; width:100%; height:100%;background:rgba(30,80,30,0.13); align-items:center; justify-content:center;">
+  <div class="custom-modal-card login-box">
+    <h2><span style="font-weight: bold;">Sign In</span> to Your Account</h2>
+    <input type="text" id="loginName" placeholder="Enter Name">
+    <input type="email" id="loginEmail" placeholder="Enter Email">
+    <input type="password" id="loginPass" placeholder="Enter Password">
+    <button onclick="login()">Sign In</button>
+    <button class="close-modal cancel-btn" onclick="closeLogin()">Cancel</button>
+    <div class="modal-switch">Don't have an account? <button onclick="showSignup()">Sign Up</button></div>
+  </div>
+</div>
+
+<!-- SIGNUP MODAL -->
+<div class="login-modal custom-modal-bg" id="signupModal" style="display:none; position:fixed; z-index:20; left:0; top:0; width:100%; height:100%;background:rgba(30,80,30,0.13); align-items:center; justify-content:center;">
+  <div class="custom-modal-card login-box">
+    <h2><span style="font-weight: bold;">Create Account</span></h2>
+    <input type="text" id="signupName" placeholder="Your Name">
+    <input type="email" id="signupEmail" placeholder="Your Email">
+    <input type="password" id="signupPass" placeholder="Choose Password">
+    <button onclick="signup()">Create Account</button>
+    <button class="close-modal cancel-btn" onclick="closeSignup()">Cancel</button>
+    <div class="modal-switch">Already have an account? <button onclick="showLogin()">Login</button></div>
+  </div>
+</div>
+
+<!-- The rest: your original Bootstrap Navigation, upload/detection UI -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark" style="padding-top:0.3em; padding-bottom:0.3em;">
+  <div class="container-fluid d-flex align-items-center" style="padding:0;">
+    <div style="flex-shrink:0;">
+      <a class="navbar-brand" href="#" style="font-weight:bold;">
+        <img src="../static/images/logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+        PRO VERSION [MAKE FARMERS HAPPY]
+      </a>
+    </div>
+    <div style="flex:1; min-width:0;">
+      <marquee 
+        direction="left" 
+        scrollamount="7"
+        style="color:#fff; font-weight: bold; font-size:1.13em; text-transform:uppercase; letter-spacing:1.4px; background:none; border:none; width:100%; min-width:0; white-space:nowrap;">
+        KNOW WHAT PROBLEM YOUR PLANT IS FACING___MAKE SURE TO TAKE APPROPRIATE PREVENTIVE MEASURES.
+      </marquee>
+    </div>
+  </div>
+</nav>
+
+
+  <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner " >
+        <div class="carousel-item active">
+          <div class="carousel-text-wrapper">
+            <h1 class="carousel-text-title">Plant Disease Recognition</h1>
+            <div class="form-box">
+              <form action="/upload/" method = "POST" enctype="multipart/form-data">
+                <h1>Upload Image</h1>
+                <div class="input-box d-flex">
+                  <input type="file"  accept="image/png, image/jpeg"  name="img" required>
+                </div>
+                <div class="input-box d-flex">
+                  <button type="submit" class="btn btn-success m-auto">Upload</button>
+                </div>
+              </form>
+              {% if result %}
+              <div class="result-container">
+                <div class="result-box">
+                  <div class="result-img-container">
+                    <img src="{{imagepath}}" alt="uploaded image" class="result-image">
+                  </div>
+                  <div class="result-text">
+                    <h3>{{prediction['name']}}</h3>
+                    <p>{{prediction['cause']}}</p>
+                    <p>{{prediction['cure']}}</p>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+                        {% if contourimg %}
+            <div class="result-container" style="margin-top:1.5em;">
+              <div class="result-box">
+                <div class="result-img-container">
+                  <h4>Contour Output:</h4>
+                  <img id="contour_img" src="{{contourimg}}" alt="Contour Image" width="400">
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+            </div>
+            <!-- (rest of your original page remains unchanged) -->
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <script>
+function showLogin() {
+  document.getElementById('loginModal').style.display = 'flex';
+  document.getElementById('signupModal').style.display = 'none';
+}
+function closeLogin() {
+  document.getElementById('loginModal').style.display = 'none';
+}
+function login() {
+  const name = document.getElementById('loginName').value.trim();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  if (!name || !email || !pass) {
+    alert('Fill all fields.');
+    return;
+  }
+  loginNav.style.display = 'none';
+  profileNav.style.display = 'inline-block';
+  profileName.textContent = 'Name: ' + name;
+  profileEmail.textContent = 'Email: ' + email;
+  closeLogin();
+  closeProfileMenu();
+}
+function showSignup() {
+  document.getElementById('signupModal').style.display = 'flex';
+  document.getElementById('loginModal').style.display = 'none';
+}
+function closeSignup() {
+  document.getElementById('signupModal').style.display = 'none';
+}
+function signup() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass = document.getElementById('signupPass').value.trim();
+  if (!name || !email || !pass) {
+    alert('Fill all fields.');
+    return;
+  }
+  alert('Signup successful! Please login.');
+  closeSignup();
+  showLogin();
+}
+function toggleProfileMenu() {
+  var profileMenu = document.getElementById('profileMenu');
+  if (profileMenu.classList.contains('active')) {
+    closeProfileMenu();
+  } else {
+    profileMenu.classList.add('active');
+    profileMenu.style.display = 'block';
+  }
+}
+function closeProfileMenu() {
+  var profileMenu = document.getElementById('profileMenu');
+  profileMenu.classList.remove('active');
+  profileMenu.style.display = 'none';
+}
+function signout() {
+  loginNav.style.display = 'inline-block';
+  profileNav.style.display = 'none';
+  closeProfileMenu();
+  alert('You have signed out.');
+}
+window.addEventListener('click', function(e) {
+  var profileNav = document.getElementById('profileNav');
+  if (!profileNav.contains(e.target)) { closeProfileMenu(); }
+});
+var loginNav = document.getElementById('loginNav');
+var profileNav = document.getElementById('profileNav');
+var profileMenu = document.getElementById('profileMenu');
+var profileName = document.getElementById('profileName');
+var profileEmail = document.getElementById('profileEmail');
+</script>
+<script src="../static/js/bootstrap.bundle.min.js"></script>
+<!-- Feature Cards Section | Place this before </body> -->
+
+<style>
+.features-section-modern {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2.2rem;
+  padding: 3vh 0 5vh 0;
+  background: linear-gradient(120deg, #e7ffe7, #d7fff1 118%);
+}
+.feature-card-modern {
+  background: #fffbe7;
+  border-radius: 20px;
+  box-shadow: 0 4px 18px #e0faef95;
+  border: 2px solid #eafccc;
+  padding: 2.2em 1.5em 2em 1.5em;
+  min-width: 220px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 1.2em 0;
+  transition: all .2s;
+}
+.feature-card-modern:hover {
+  transform: translateY(-7px) scale(1.03);
+  box-shadow: 0 12px 32px #b1e1c654;
+  border-color: #13ab74;
+}
+.feature-card-modern .feature-icon {
+  display: block;
+  font-size: 3em;
+  color: #179c6b;
+  margin-bottom: .6em;
+  margin-top: .2em;
+}
+.feature-card-modern .feature-title {
+  font-size: 1.18em;
+  font-weight: bold;
+  color: #179c6b;
+  margin-bottom: .3em;
+}
+.feature-card-modern .feature-desc {
+  color: #31795b;
+  font-size: 1.06em;
+  font-weight: 500;
+  line-height: 1.38;
+}
+@media(max-width:1100px){.features-section-modern{gap:1em;}}
+@media(max-width:900px){
+  .features-section-modern{ flex-direction:column; align-items:center; gap:1.8em;}
+  .feature-card-modern{max-width:90vw;}
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<section class="features-section-modern">
+  <a href="/fast-disease-detection" class="feature-card-modern" style="text-decoration:none;">
+    <i class="fa-solid fa-leaf feature-icon"></i>
+    <div class="feature-title">Fast Disease Detection</div>
+    <div class="feature-desc">Use AI to predict plant diseases from uploaded images in seconds.</div>
+  </a>
+  <a href="/dashboard-history" class="feature-card-modern" style="text-decoration:none;">
+    <i class="fa-solid fa-chart-line feature-icon"></i>
+    <div class="feature-title">Dashboard & History</div>
+    <div class="feature-desc">Track your past diagnoses, monitor plant health over time.</div>
+  </a>
+  <a href="/treatment-guidance" class="feature-card-modern" style="text-decoration:none;">
+    <i class="fa-solid fa-shield-virus feature-icon"></i>
+    <div class="feature-title">Treatment Guidance</div>
+    <div class="feature-desc">Get actionable advice for treating detected diseases.</div>
+  </a>
+  <a href="/user-profile-settings" class="feature-card-modern" style="text-decoration:none;">
+    <i class="fa-solid fa-user feature-icon"></i>
+    <div class="feature-title">User Profile & Settings</div>
+    <div class="feature-desc">Personalize your experience, manage preferences securely.</div>
+  </a>
+  <a href="/support-contact" class="feature-card-modern" style="text-decoration:none;">
+    <i class="fa-solid fa-headset feature-icon"></i>
+    <div class="feature-title">Support & Contact</div>
+    <div class="feature-desc">Chat with plant health experts or reach out directly for help.</div>
+  </a>
+</section>
+
+<!-- Modern Footer Section -->
+<style>
+.footer-modern {
+  width: 100%;
+  background: linear-gradient(90deg, #d6ffef 70%, #e7fff7 98%);
+  color: #31795b;
+  font-size: 1.07em;
+  padding: 2.3em 0 1.5em 0;
+  text-align: center;
+  letter-spacing: 0.8px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  border-top: 1.8px solid #aeeec8;
+  margin-top: 0;
+  box-shadow: 0 -2px 18px #b7eedb70;
+}
+.footer-modern a {
+  color: #20e295;
+  text-decoration: underline;
+  font-weight: 500;
+  transition: color 0.18s;
+}
+.footer-modern a:hover {
+  color: #2e8cff;
+}
+</style>
+<footer class="footer-modern">
+  &copy; 2025 <strong>Plant Diagnosis Pro</strong> &mdash; Made by <span style="color:#ff8181;">OMKAR</span> for better farming. &nbsp; | &nbsp;
+  <a href="#">Contact</a> &nbsp; | &nbsp;
+  <a href="#">Privacy Policy</a>
+</footer>
+
+</body>
+</html>
